@@ -7,7 +7,7 @@ import { cookies, headers } from "next/headers";
 import jwt from "jsonwebtoken";
 
 type Post = {
-  _id: ObjectId;
+  _id: string;
   title: string;
   content: string;
   author: string;
@@ -47,20 +47,26 @@ export async function getPosts(
     .collection("users")
     .findOne({ _id: new ObjectId(userId!) });
   const skip = (page - 1) * limit;
-  const posts = (await client
+  const posts = await client
     .db()
     .collection("posts")
     .find({ author: author?.email })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .toArray()) as unknown as Post[];
+    .toArray();
 
-  const totalPosts = await client.db().collection("posts").countDocuments();
+  const totalPosts = await client
+    .db()
+    .collection("posts")
+    .countDocuments({ author: author?.email });
   const totalPages = Math.ceil(totalPosts / limit);
 
   return {
-    posts,
+    posts: posts.map((post) => ({
+      ...post,
+      _id: post._id.toString(),
+    })) as Post[],
     currentPage: page,
     totalPages,
     hasNextPage: page < totalPages,
@@ -69,21 +75,43 @@ export async function getPosts(
 }
 
 export async function getPostById(id: string) {
+  const userId = headers().get("X-User-ID");
+  const author = await client
+    .db()
+    .collection("users")
+    .findOne({ _id: new ObjectId(userId!) });
+  if (!author) {
+    throw new Error("User not found");
+  }
   const post = await client
     .db()
     .collection("posts")
-    .findOne({ _id: new ObjectId(id) });
-  return post;
+    .findOne({ _id: new ObjectId(id), author: author.email });
+
+  if (!post) return null;
+
+  return { ...post, _id: post._id.toString() } as Post;
 }
 
-export async function createPost(post: {
-  title: string;
-  content: string;
-  author: string;
-  createdAt: Date;
-}) {
-  const result = await client.db().collection("posts").insertOne(post);
-  return result.insertedId;
+export async function createPost(post: { title: string; content: string }) {
+  const userId = headers().get("X-User-ID");
+  const author = await client
+    .db()
+    .collection("users")
+    .findOne({ _id: new ObjectId(userId!) });
+  if (!author) {
+    throw new Error("User not found");
+  }
+  const result = await client
+    .db()
+    .collection("posts")
+    .insertOne({
+      ...post,
+      author: author?.email,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  return result.insertedId.toString();
 }
 
 export async function updatePost(
@@ -91,14 +119,15 @@ export async function updatePost(
   post: {
     title: string;
     content: string;
-    author: string;
-    createdAt: Date;
   }
 ) {
   const result = await client
     .db()
     .collection("posts")
-    .updateOne({ _id: new ObjectId(id) }, { $set: post });
+    .updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { ...post, updatedAt: new Date() } }
+    );
   return result.modifiedCount;
 }
 

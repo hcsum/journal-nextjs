@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@mui/material";
+import { Card, CardContent, Link } from "@mui/material";
 import { getPosts } from "../actions";
 import Pagination from "./Pagination";
 import { redirect } from "next/navigation";
@@ -13,22 +13,21 @@ const PostsPage = async ({
   if (!searchParams.page) {
     redirect("/posts?page=1");
   }
-  const page = Number(searchParams.page) || 1;
+  const page = Number(searchParams.page);
   const { posts, totalPages } = await getPosts(page, TAKE);
   return (
     <div>
       <h1>Posts</h1>
+      <Link href="/posts/new">Add new</Link>
       {posts.map((post) => (
-        <Card
-          key={post._id.toString()}
-          sx={{ marginBottom: "1rem" }}
-          variant="outlined"
-        >
+        <Card key={post._id} sx={{ marginBottom: "1rem" }} variant="outlined">
           <CardContent>
-            <h2 className="font-bold mb-2">{post.title}</h2>
+            <h2 className="font-bold mb-2">
+              <Link href={`/posts/${post._id}`}>{post.title}</Link>
+            </h2>
             <div dangerouslySetInnerHTML={{ __html: post.content }} />
             <p className="text-sm text-gray-500">
-              {post.updatedAt.toLocaleString()}
+              {post.createdAt?.toLocaleString()}
             </p>
           </CardContent>
         </Card>

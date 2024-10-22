@@ -2,10 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import * as jose from "jose";
 
-const PROTECTED_ROUTES = ["/posts"];
-
 export async function authMiddleware(request: NextRequest) {
-  if (!PROTECTED_ROUTES.includes(request.nextUrl.pathname)) return;
+  if (!request.nextUrl.pathname.startsWith("/posts")) return;
 
   const token = request.cookies.get("session");
 

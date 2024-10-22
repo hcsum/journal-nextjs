@@ -11,6 +11,7 @@
     "@mui/material": "^6.1.4",
     "@mui/material-nextjs": "^6.1.4",
     "bcrypt": "^5.1.1",
+    "formik": "^2.4.6",
     "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0",

@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "@/styles/globals.css";
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { Roboto } from 'next/font/google';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from '../theme';
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import { Roboto } from "next/font/google";
 
 const roboto = Roboto({
-    weight: ['300', '400', '500', '700'],
-    subsets: ['latin'],
-    display: 'swap',
-    variable: '--font-roboto',
-  });
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-roboto",
+});
 
 export const metadata: Metadata = {
   title: "journal",
@@ -25,10 +22,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.variable}>
-        <AppRouterCacheProvider>
-          {children}
-        </AppRouterCacheProvider>
+      <body className={`${roboto.variable} p-4`}>
+        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
       </body>
     </html>
   );
