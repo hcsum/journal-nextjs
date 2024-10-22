@@ -17,15 +17,17 @@ const PostsPage = async ({
   const { posts, totalPages } = await getPosts(page, TAKE);
   return (
     <div>
-      <h1>Posts</h1>
-      <Link href="/posts/new">Add new</Link>
+      <h1 className="text-2xl font-bold mb-4 dark:text-white">Posts</h1>
+      <Link href="/posts/new" sx={{ mb: 2, display: "inline-block" }}>
+        Add new
+      </Link>
       {posts.map((post) => (
         <Card key={post._id} sx={{ marginBottom: "1rem" }} variant="outlined">
           <CardContent>
             <h2 className="font-bold mb-2">
-              <Link href={`/posts/${post._id}`}>{post.title}</Link>
+              {/* <Link href={`/posts/${post._id}`}>{post.title}</Link> */}
             </h2>
-            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            {/* <div dangerouslySetInnerHTML={{ __html: post.content }} /> */}
             <p className="text-sm text-gray-500">
               {post.createdAt?.toLocaleString()}
             </p>

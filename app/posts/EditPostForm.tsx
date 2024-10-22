@@ -3,7 +3,7 @@
 import React from "react";
 import { Formik, Form, Field } from "formik";
 import { TextField, Button, Box } from "@mui/material";
-import { updatePost } from "@/app/actions";
+import { deletePost, updatePost } from "@/app/actions";
 import { useRouter } from "next/navigation";
 
 interface Post {
@@ -15,54 +15,71 @@ interface Post {
 const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
   const router = useRouter();
 
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this post?")) {
+      await deletePost(post._id);
+      router.push("/posts");
+    }
+  };
+
   return (
-    <Formik
-      initialValues={{
-        title: post.title,
-        content: post.content,
-      }}
-      onSubmit={async (values, { setSubmitting }) => {
-        try {
-          await updatePost(post._id, values);
-          router.push("/posts");
-        } catch (error) {
-          console.error("Failed to update post:", error);
-        } finally {
-          setSubmitting(false);
-        }
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Field
-              as={TextField}
-              name="title"
-              label="Title"
-              fullWidth
-              variant="outlined"
-            />
-            <Field
-              as={TextField}
-              name="content"
-              label="Content"
-              multiline
-              rows={4}
-              fullWidth
-              variant="outlined"
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={isSubmitting}
-            >
-              Update Post
-            </Button>
-          </Box>
-        </Form>
-      )}
-    </Formik>
+    <>
+      <Formik
+        initialValues={{
+          title: post.title,
+          content: post.content,
+        }}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            await updatePost(post._id, values);
+            router.push("/posts");
+          } catch (error) {
+            console.error("Failed to update post:", error);
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <Field
+                as={TextField}
+                name="title"
+                label="Title"
+                fullWidth
+                variant="outlined"
+              />
+              <Field
+                as={TextField}
+                name="content"
+                label="Content"
+                multiline
+                rows={12}
+                fullWidth
+                variant="outlined"
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Update Post
+              </Button>
+            </Box>
+          </Form>
+        )}
+      </Formik>
+      <Button
+        variant="contained"
+        color="warning"
+        onClick={handleDelete}
+        sx={{ mt: 8 }}
+      >
+        Delete
+      </Button>
+    </>
   );
 };
 

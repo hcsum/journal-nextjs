@@ -17,8 +17,8 @@ const NewPostPage: React.FC = () => {
       }}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          const postId = await createPost(values);
-          router.push(`/posts/${postId}`);
+          await createPost(values);
+          router.push(`/posts`);
         } catch (error) {
           console.error("Failed to create post:", error);
         } finally {
@@ -41,7 +41,7 @@ const NewPostPage: React.FC = () => {
               name="content"
               label="Content"
               multiline
-              rows={4}
+              rows={12}
               fullWidth
               variant="outlined"
             />
