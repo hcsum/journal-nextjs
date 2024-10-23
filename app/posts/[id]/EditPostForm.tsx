@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field } from "formik";
 import { TextField, Button, Box } from "@mui/material";
 import { deletePost, updatePost } from "@/app/actions";
@@ -10,9 +10,12 @@ interface Post {
   _id: string;
   title: string;
   content: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -21,6 +24,29 @@ const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
       router.push("/posts");
     }
   };
+
+  if (!isEditing) {
+    return (
+      <>
+        <h1 className="text-xl font-bold dark:text-white">{post.title}</h1>
+        <p className="text-gray-500 mt-2 dark:text-white">{post.content}</p>
+        <p className="text-sm text-gray-500 mt-4">
+          Created: {post.createdAt.toLocaleString()}
+        </p>
+        <p className="text-sm text-gray-500 mt-2">
+          Last updated: {post.updatedAt.toLocaleString()}
+        </p>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+          onClick={() => setIsEditing(true)}
+        >
+          Edit Post
+        </Button>
+      </>
+    );
+  }
 
   return (
     <>
@@ -40,7 +66,7 @@ const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
           }
         }}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, dirty, isValid }) => (
           <Form>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Field
@@ -63,7 +89,7 @@ const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !dirty || !isValid}
               >
                 Update Post
               </Button>
@@ -72,8 +98,21 @@ const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
         )}
       </Formik>
       <Button
+        type="button"
         variant="contained"
+        sx={{ display: "block", mt: 2 }}
         color="warning"
+        onClick={() => {
+          if (confirm("Are you sure you want to cancel?")) {
+            setIsEditing(false);
+          }
+        }}
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        color="error"
         onClick={handleDelete}
         sx={{ mt: 8 }}
       >

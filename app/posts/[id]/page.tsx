@@ -1,6 +1,6 @@
 import { getPostById } from "@/app/actions";
 import { notFound } from "next/navigation";
-import EditPostForm from "../EditPostForm";
+import EditPostForm from "./EditPostForm";
 
 export default async function EditPostPage({
   params,

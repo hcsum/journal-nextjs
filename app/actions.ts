@@ -173,3 +173,7 @@ export async function login(formData: FormData) {
   });
   return user;
 }
+
+export async function logout() {
+  cookies().delete("session");
+}

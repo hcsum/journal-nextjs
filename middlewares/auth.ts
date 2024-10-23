@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import * as jose from "jose";
 
 export async function authMiddleware(request: NextRequest) {
-  if (!request.nextUrl.pathname.startsWith("/posts")) return;
+  if (request.nextUrl.pathname.startsWith("/login")) return NextResponse.next();
 
   const token = request.cookies.get("session");
 

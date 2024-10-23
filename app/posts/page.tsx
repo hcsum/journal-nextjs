@@ -22,17 +22,22 @@ const PostsPage = async ({
         Add new
       </Link>
       {posts.map((post) => (
-        <Card key={post._id} sx={{ marginBottom: "1rem" }} variant="outlined">
-          <CardContent>
-            <h2 className="font-bold mb-2">
-              {/* <Link href={`/posts/${post._id}`}>{post.title}</Link> */}
-            </h2>
-            {/* <div dangerouslySetInnerHTML={{ __html: post.content }} /> */}
-            <p className="text-sm text-gray-500">
-              {post.createdAt?.toLocaleString()}
-            </p>
-          </CardContent>
-        </Card>
+        <div
+          key={post._id}
+          className="block max-w-xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 mb-4"
+        >
+          <Link href={`/posts/${post._id}`}>
+            <h3 className="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+              {post.title}
+            </h3>
+          </Link>
+          <p className="font-normal text-gray-700 dark:text-gray-400">
+            {post.content}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {post.createdAt?.toLocaleString()}
+          </p>
+        </div>
       ))}
       <Pagination totalPages={totalPages} currentPage={page} />
     </div>
