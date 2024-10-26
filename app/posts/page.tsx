@@ -31,9 +31,10 @@ const PostsPage = async ({
               {post.title}
             </h3>
           </Link>
-          <p className="font-normal text-gray-700 dark:text-gray-400">
-            {post.content}
-          </p>
+          <div
+            className="font-normal text-gray-700 dark:text-gray-400"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
           <p className="text-sm text-gray-500 mt-2">
             {post.createdAt?.toLocaleString()}
           </p>

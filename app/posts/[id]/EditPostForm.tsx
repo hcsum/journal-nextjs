@@ -29,10 +29,13 @@ const EditPostForm: React.FC<{ post: Post }> = ({ post }) => {
     return (
       <>
         <h1 className="text-xl font-bold dark:text-white">{post.title}</h1>
-        <p className="text-gray-500 mt-2 dark:text-white">{post.content}</p>
-        <p className="text-sm text-gray-500 mt-4">
+        <p
+          className="text-gray-500 mt-2 dark:text-white"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+        <div className="text-sm text-gray-500 mt-4">
           Created: {post.createdAt.toLocaleString()}
-        </p>
+        </div>
         <p className="text-sm text-gray-500 mt-2">
           Last updated: {post.updatedAt.toLocaleString()}
         </p>
