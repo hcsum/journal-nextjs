@@ -1,27 +1,23 @@
-"use client";
-
-import { FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { login } from "../actions";
+import { revalidatePath } from "next/cache";
 
 export default function LoginPage() {
-  const router = useRouter();
+  async function handleSubmit(formData: FormData) {
+    "use server";
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const user = await login(formData);
-    if (user) {
-      router.push("/");
-    }
+    await login(formData);
+    revalidatePath("/posts");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 ">
+    <form action={handleSubmit} className="flex flex-col gap-2 ">
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
-      <button type="submit" className="dark:text-white">
+      <button
+        formAction={handleSubmit}
+        type="submit"
+        className="dark:text-white"
+      >
         Login
       </button>
     </form>
