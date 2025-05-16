@@ -1,6 +1,6 @@
 "use server";
 
-import client from "@/lib/mongodb";
+import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
 import { cookies, headers } from "next/headers";
@@ -18,7 +18,7 @@ type Post = {
 export async function testDatabaseConnection() {
   let isConnected = false;
   try {
-    const mongoClient = await client.connect();
+    const mongoClient = await clientPromise;
     // Send a ping to confirm a successful connection
     await mongoClient.db("admin").command({ ping: 1 });
     console.log(
@@ -42,12 +42,13 @@ export async function getPosts(
   hasPreviousPage: boolean;
 }> {
   const userId = headers().get("X-User-ID");
-  const author = await client
+  const mongoClient = await clientPromise;
+  const author = await mongoClient
     .db()
     .collection("users")
     .findOne({ _id: new ObjectId(userId!) });
   const skip = (page - 1) * limit;
-  const posts = await client
+  const posts = await mongoClient
     .db()
     .collection("posts")
     .find({ author: author?.email })
@@ -56,7 +57,7 @@ export async function getPosts(
     .limit(limit)
     .toArray();
 
-  const totalPosts = await client
+  const totalPosts = await mongoClient
     .db()
     .collection("posts")
     .countDocuments({ author: author?.email });
@@ -76,14 +77,15 @@ export async function getPosts(
 
 export async function getPostById(id: string) {
   const userId = headers().get("X-User-ID");
-  const author = await client
+  const mongoClient = await clientPromise;
+  const author = await mongoClient
     .db()
     .collection("users")
     .findOne({ _id: new ObjectId(userId!) });
   if (!author) {
     throw new Error("User not found");
   }
-  const post = await client
+  const post = await mongoClient
     .db()
     .collection("posts")
     .findOne({ _id: new ObjectId(id), author: author.email });
@@ -95,14 +97,15 @@ export async function getPostById(id: string) {
 
 export async function createPost(post: { title: string; content: string }) {
   const userId = headers().get("X-User-ID");
-  const author = await client
+  const mongoClient = await clientPromise;
+  const author = await mongoClient
     .db()
     .collection("users")
     .findOne({ _id: new ObjectId(userId!) });
   if (!author) {
     throw new Error("User not found");
   }
-  const result = await client
+  const result = await mongoClient
     .db()
     .collection("posts")
     .insertOne({
@@ -121,7 +124,8 @@ export async function updatePost(
     content: string;
   }
 ) {
-  const result = await client
+  const mongoClient = await clientPromise;
+  const result = await mongoClient
     .db()
     .collection("posts")
     .updateOne(
@@ -132,7 +136,8 @@ export async function updatePost(
 }
 
 export async function deletePost(id: string) {
-  const result = await client
+  const mongoClient = await clientPromise;
+  const result = await mongoClient
     .db()
     .collection("posts")
     .deleteOne({ _id: new ObjectId(id) });
@@ -150,21 +155,18 @@ export async function login(formData: FormData) {
   ) {
     return null;
   }
-
-  const user = await client.db().collection("users").findOne({ email });
+  const mongoClient = await clientPromise;
+  const user = await mongoClient.db().collection("users").findOne({ email });
   if (!user) {
     return null;
   }
-
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     return null;
   }
-
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
     expiresIn: "1 week",
   });
-
   cookies().set("session", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
